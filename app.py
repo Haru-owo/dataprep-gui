@@ -1,18 +1,22 @@
 import gradio as gr
 from llm_handler import LLMHandler
 from prompt_creator import create_prompt
-from config import MODEL_ID
 
 print("모델을 로딩하고 있습니다... 시간이 걸릴 수 있습니다.")
-llm_handler = LLMHandler(MODEL_ID)
-print("모델 로딩 완료!")
+try:
+    # LLMHandler를 호출할 때 아무 인자도 넘기지 않습니다.
+    llm_handler = LLMHandler()
+    print("모델 로딩 완료!")
+except (FileNotFoundError, ValueError, KeyError) as e:
+    print(f"설정 오류: {e}")
+    llm_handler = None # 핸들러 초기화 실패
 
 def process_data_with_prompt(custom_prompt, raw_data):
     """프롬프트 기반 데이터 처리 로직"""
     if not raw_data or not custom_prompt:
         return "프롬프트와 원본 데이터를 모두 입력해주세요."
     if not llm_handler or not llm_handler.pipeline:
-        return "모델이 아직 로딩 중이거나 로딩에 실패했습니다. 잠시 후 다시 시도해주세요."
+        return "모델이 로딩되지 않았습니다. setting.conf 파일을 확인하고 프로그램을 다시 시작해주세요."
 
     prompt = create_prompt(custom_prompt, raw_data)
     result = llm_handler.get_response(prompt)
@@ -68,4 +72,7 @@ with gr.Blocks(theme=gr.themes.Soft()) as demo:
             )
 
 if __name__ == "__main__":
-    demo.launch()
+    if llm_handler:
+        demo.launch()
+    else:
+        print("Gradio 앱을 시작할 수 없습니다. 설정 파일을 확인해주세요.")
