@@ -1,5 +1,6 @@
 transformers
-torch
 accelerate
 bitsandbytes
 gradio
+pypdf
+torch torchvision --index-url https://download.pytorch.org/whl/cu126
