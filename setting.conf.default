@@ -1,0 +1,3 @@
+[HUGGINGFACE]
+TOKEN = "Enter-Hugging_Face_TOKEN"
+MODEL_ID = "Enter-Hugging_Face_Model_ID(Name)"

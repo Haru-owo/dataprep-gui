@@ -1,25 +1,23 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-import os
+from transformers import pipeline
+from settings_loader import load_settings
 
 class LLMHandler:
-    def __init__(self, model_id):
-        self.model_id = model_id
+    def __init__(self):
+        self.settings = load_settings()
+        self.model_id = self.settings['model_id']
+        self.hf_token = self.settings['hf_token']
         self.pipeline = None
         self._initialize_pipeline()
 
     def _initialize_pipeline(self):
         try:
-            hf_token = os.getenv("HUGGING_FACE_TOKEN")
-            if not hf_token:
-                raise ValueError("HUGGING_FACE_TOKEN 환경 변수가 설정되지 않았습니다.")
-
             self.pipeline = pipeline(
                 "text-generation",
                 model=self.model_id,
                 model_kwargs={"torch_dtype": torch.bfloat16},
                 device_map="auto",
-                token=hf_token
+                token=self.hf_token
             )
         except Exception as e:
             print(f"모델 파이프라인 초기화 중 오류 발생: {e}")
@@ -52,4 +50,3 @@ class LLMHandler:
             return response.strip()
         except Exception as e:
             return f"응답 생성 중 오류 발생: {e}"
-
