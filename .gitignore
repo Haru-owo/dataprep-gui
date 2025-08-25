@@ -1,11 +1,9 @@
-# add
-*.conf/
-*.conf
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
 *$py.class
+*.conf
+*.conf
 
 # C extensions
 *.so
