@@ -14,22 +14,18 @@ except (FileNotFoundError, ValueError, KeyError) as e:
     print(f"설정 오류: {e}")
     llm_handler = None
 
-def process_folder(custom_prompt, folder_obj, save_format, progress=gr.Progress()):
+def process_folder(custom_prompt, folder_files, save_format, progress=gr.Progress()):
     """폴더 내의 모든 파일을 처리하고 결과를 ZIP 파일로 묶는 로직"""
-    if not folder_obj:
+    if not folder_files:
         return "폴더를 먼저 업로드해주세요.", None
     if not custom_prompt:
         return "프롬프트를 입력해주세요.", None
     if not llm_handler or not llm_handler.pipeline:
         return "모델이 로딩되지 않았습니다. setting.conf 파일을 확인하고 프로그램을 다시 시작해주세요.", None
 
-    folder_path = folder_obj.name
-    
-    # 처리할 파일 목록 수집
-    files_to_process = []
-    for root, _, files in os.walk(folder_path):
-        for name in files:
-            files_to_process.append(os.path.join(root, name))
+    # Gradio는 폴더 업로드 시 파일 객체의 '리스트'를 전달합니다.
+    # 각 파일 객체의 .name 속성을 사용하여 실제 파일 경로를 가져옵니다.
+    files_to_process = [f.name for f in folder_files]
 
     if not files_to_process:
         return "폴더에 처리할 파일이 없습니다.", None
